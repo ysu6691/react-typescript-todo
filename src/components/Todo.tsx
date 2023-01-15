@@ -15,6 +15,8 @@ interface ITodo {
 const Todo = function () {
   const dispatch = useAppDispatch()
   const todos = useAppSelector(state => state.todo.todos)
+
+  // 미완료 todo부터 위로 올라오도록 설정
   const todoList: ITodo[] = []
   let notCompleteTodoCnt = 0
   todos.forEach((todo) => {
@@ -28,6 +30,7 @@ const Todo = function () {
       todoList.push(todo)
     }
   })
+
   const todoComponents = todoList.map((todo) => {
     return <TodoItem
       key={todo.id}
@@ -101,7 +104,7 @@ const TodoContainer= styled.div`
 
 const TodoButton = styled.div`
   position: absolute;
-  top: 90%;
+  top: 88%;
   left: 50%;
   transform: translateX(-50%);
   width: 60px;

@@ -1,4 +1,20 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
+
+const asyncDeleteTodo = createAsyncThunk(
+  'todoSlice/asyncDeleteTodo',
+  async (todoId: number) => {
+    function asyncFunction () {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve('')
+        }, 300)
+      })
+    }
+    await asyncFunction()
+    return todoId
+  }
+)
+
 
 interface Todo {
   id: number,
@@ -27,7 +43,7 @@ const todoSlice = createSlice({
         return todo.isNew
       })
       if (HavingNewTodo) {
-        alert('할 일을 입력해주세요.')
+        alert('새로운 할 일을 입력해주세요.')
         return
       }
       const today = new Date()
@@ -36,7 +52,7 @@ const todoSlice = createSlice({
         content: '새로운 TODO',
         isComplete: false,
         isNew: true,
-        createdAt: today.getFullYear() + '-' + today.getMonth() + 1 + '-' + today.getDate() + ' ' + today.getHours() + ':' + today.getMinutes()
+        createdAt: today.getFullYear() + '-' + today.getMonth() + 1 + '-' + today.getDate() + ' ' + today.getHours().toString().padStart(2, '0') + ':' + today.getMinutes().toString().padStart(2, '0')
       }
       state.todos = [newTodo, ...state.todos]
       state.id += 1
@@ -60,8 +76,25 @@ const todoSlice = createSlice({
       })
       state.todos = newTodos
     }
+  },
+  extraReducers: builder => {
+    builder.addCase(asyncDeleteTodo.pending, (state, action) => {
+      alert('삭제되었습니다.')
+    })
+    builder.addCase(asyncDeleteTodo.fulfilled, (state, action) => {
+      const newTodos = [...state.todos]
+      const targetTodo = newTodos.find((todo) => {
+        return todo.id === action.payload
+      })
+      if (targetTodo !== undefined) {
+        const idx = newTodos.indexOf(targetTodo)
+        newTodos.splice(idx, 1)
+      }
+      state.todos = newTodos
+    })
   }
 })
 
 export const todoActions = todoSlice.actions
+export { asyncDeleteTodo }
 export default todoSlice.reducer
